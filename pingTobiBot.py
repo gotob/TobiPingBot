@@ -16,24 +16,26 @@ class pingThread(threading.Thread):
 		self.change = 0
 	def run(self):
 		while (self.vivo):
-			ping = 'ping -n 2 ' + self.ip
-			(out) = subprocess.Popen(ping, stdout=subprocess.PIPE, shell=True).communicate()
-			if re.search('Ricevuti = 0', str(out)):
+			result = subprocess.call('ping ' + self.ip)
+        	#ping = 'ping -n 2 ' + self.ip
+			#(out) = subprocess.Popen(ping, stdout=subprocess.PIPE, shell=True).communicate()
+			if result == 1:
+			#if re.search('Ricevuti = 0', str(out)):
 				if (self.change == 0 or self.change == 2):
 					print self.chatID + ', ' + self.ip + ', dead\n'
 					tobiBot.sendMessage(self.chatID, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ', ' + self.chatID + ', ' + self.ip + ', dead\n')
 					self.change = 1
-				lockLog.acquire()
-				logFile.write(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ', ' + self.chatID + ', ' + self.ip + ', dead\n')
-				lockLog.release()
+					lockLog.acquire()
+					logFile.write(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ', ' + self.chatID + ', ' + self.ip + ', dead\n')
+					lockLog.release()
 			else:
 				if (self.change == 0 or self.change == 1):
 					print self.chatID + ', ' + self.ip + ', alive\n'
 					tobiBot.sendMessage(self.chatID, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ', ' + self.chatID + ', ' + self.ip + ', alive\n')
 					self.change = 2
-				lockLog.acquire()
-				logFile.write(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ', ' + self.chatID + ', ' + self.ip + ', alive\n')
-				lockLog.release()
+					lockLog.acquire()
+					logFile.write(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ', ' + self.chatID + ', ' + self.ip + ', alive\n')
+					lockLog.release()
 def getUpdates(tkn):
 	source = urllib2.urlopen('https://api.telegram.org/bot'+ tkn +'/getUpdates').read()
 	listaIDS = re.findall('\"id\":([0-9]+),\"is_bot\"', source)
